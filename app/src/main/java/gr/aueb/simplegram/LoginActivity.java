@@ -1,4 +1,4 @@
-package gr.aueb.simplegram.common;
+package gr.aueb.simplegram;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import gr.aueb.simplegram.MainActivity;
 import gr.aueb.simplegram.R;
@@ -17,6 +18,8 @@ public class LoginActivity extends AppCompatActivity {
 
     EditText usernameEditText;
     Button loginButton;
+
+    LoginActivity thisActivity = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +45,9 @@ public class LoginActivity extends AppCompatActivity {
                 editor.putString("username", usernameInput);
                 editor.apply();
                 // Launch main activity.
-
+                Toast.makeText(getApplicationContext(), "User with username: '"+usernameInput+"' logged in.", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(thisActivity, MainActivity.class);
+                startActivity(intent);
             }
         }));
 
