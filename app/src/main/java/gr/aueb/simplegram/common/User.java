@@ -1,6 +1,7 @@
 package gr.aueb.simplegram.common;
 
 import android.app.Application;
+import android.util.Log;
 
 public class User extends Application {
     private UserNode userNode;

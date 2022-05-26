@@ -13,6 +13,9 @@ import android.widget.Toast;
 
 import gr.aueb.simplegram.MainActivity;
 import gr.aueb.simplegram.R;
+import gr.aueb.simplegram.activities.SubbedTopicsActivity;
+import gr.aueb.simplegram.common.User;
+import gr.aueb.simplegram.common.UserNode;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -33,7 +36,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        SharedPreferences settings = getApplicationContext().getSharedPreferences(getString(R.string.userdata_config), 0);
+        SharedPreferences settings = getApplicationContext()
+                .getSharedPreferences(getString(R.string.userdata_config), 0);
 
         loginButton.setOnClickListener((new View.OnClickListener() {
             @Override
@@ -44,9 +48,13 @@ public class LoginActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = settings.edit();
                 editor.putString("username", usernameInput);
                 editor.apply();
+
+                //prepare the usernode
+                ((User) getApplication()).setUserName(usernameInput);
+
                 // Launch main activity.
                 Toast.makeText(getApplicationContext(), "User with username: '"+usernameInput+"' logged in.", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(thisActivity, MainActivity.class);
+                Intent intent = new Intent(thisActivity, SubbedTopicsActivity.class);
                 startActivity(intent);
             }
         }));
