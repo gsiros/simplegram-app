@@ -3,8 +3,8 @@ package gr.aueb.simplegram.common;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import gr.aueb.simplegram.common.values.Story;
-import gr.aueb.simplegram.common.values.Value;
+import com.simplegram.src.Story;
+import com.simplegram.src.Value;
 
 public class Topic {
     // Topic data structures

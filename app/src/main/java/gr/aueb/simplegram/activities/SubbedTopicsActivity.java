@@ -3,6 +3,7 @@ package gr.aueb.simplegram.activities;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,9 +11,11 @@ import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -20,6 +23,7 @@ import java.util.ArrayList;
 
 import gr.aueb.simplegram.R;
 import gr.aueb.simplegram.adapters.TopicViewAdapter;
+import gr.aueb.simplegram.common.Topic;
 import gr.aueb.simplegram.common.User;
 import gr.aueb.simplegram.common.UserNode;
 
@@ -30,8 +34,9 @@ public class SubbedTopicsActivity extends AppCompatActivity {
     ArrayAdapter subbedTopcisAdapter;
     AlertDialog.Builder subscribeDialog;
     EditText subscribeEditText;
+    Context context = this;
 
-    ArrayList topics;
+    ArrayList<Topic> topics;
 
 
     @Override
@@ -39,7 +44,7 @@ public class SubbedTopicsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subbed_topics);
 
-        topics = new ArrayList<String>();
+        topics = new ArrayList<Topic>(((User) getApplication()).getUserNode().getTopics().values());
 
         // Find elements from layout
         subbedTopcisListView = (ListView) findViewById(R.id.subbedtopics_listview);
@@ -82,9 +87,10 @@ public class SubbedTopicsActivity extends AppCompatActivity {
 
     class SubToTopicTask extends AsyncTask<String, Void, String>{
 
+        UserNode userNode = ((User) getApplication()).getUserNode();
+
         @Override
         protected String doInBackground(String... strings) {
-            UserNode userNode = ((User) getApplication()).getUserNode();
             userNode.sub(strings[0]);
             return strings[0];
         }
@@ -92,7 +98,7 @@ public class SubbedTopicsActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String string) {
             super.onPostExecute(string);
-            topics.add(string);
+            topics.add(userNode.getTopics().get(string));
             subbedTopcisAdapter.notifyDataSetChanged();
         }
     }

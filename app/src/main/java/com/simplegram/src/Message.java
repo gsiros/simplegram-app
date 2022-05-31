@@ -1,4 +1,4 @@
-package gr.aueb.simplegram.common.values;
+package com.simplegram.src;
 
 import java.io.Serializable;
 

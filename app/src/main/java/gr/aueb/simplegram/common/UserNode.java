@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
-import gr.aueb.simplegram.common.values.Message;
-import gr.aueb.simplegram.common.values.MultimediaFile;
-import gr.aueb.simplegram.common.values.Story;
-import gr.aueb.simplegram.common.values.Value;
+import com.simplegram.src.Message;
+import com.simplegram.src.MultimediaFile;
+import com.simplegram.src.Story;
+import com.simplegram.src.Value;
 
 /**
  * Basic class that contains all necessary information
@@ -44,6 +44,10 @@ public class UserNode {
         this.topics = new HashMap<String, Topic>();
         this.brokerAddresses = new ArrayList<InetAddress>();
         this.brokerConnections = new HashMap<InetAddress, BrokerConnection>();
+    }
+
+    public HashMap<String, Topic> getTopics() {
+        return topics;
     }
 
     /**
@@ -635,8 +639,6 @@ public class UserNode {
         @Override
         public void run() {
 
-
-
             while(true) {
                 //if(brokerConnection.isActive()){
                 try {
@@ -676,6 +678,7 @@ public class UserNode {
 
                     } while (!this.cbtIn.readUTF().equals("---"));
 
+
                     synchronized (this.topics) {
                         for (String topicName : unreads.keySet()) {
                             Topic localTopic = this.topics.get(topicName);
@@ -687,6 +690,7 @@ public class UserNode {
                                     //System.out.println(TerminalColors.ANSI_GREEN + val.getSentFrom() + "@" + topicName + ": (STORY) " + val + TerminalColors.ANSI_RESET);
                                 } else {
                                     localTopic.addMessage(val);
+                                    Log.d("UNREAD", ""+val.toString());
                                     // TODO: debug
                                     //System.out.println(TerminalColors.ANSI_GREEN + val.getSentFrom() + "@" + topicName + ": " + val + TerminalColors.ANSI_RESET);
                                 }
@@ -699,9 +703,10 @@ public class UserNode {
                     /*synchronized (brokerConnection){
                         brokerConnection.setDead();
                     }*/
-                    System.out.println("PULL FAIL: Broker #" + brokerConnection.getBrokerID()+" (" + brokerConnection.getBrokerAddress().toString()+") might be dead...");
+                    Log.d("PULLFAIL", "PULL FAIL: Broker #" + brokerConnection.getBrokerID()+" (" + brokerConnection.getBrokerAddress().toString()+") might be dead...");
                 }catch (Exception e) {
                     //e.printStackTrace();
+                    Log.d("PULLFAIL", "the error is: ",e);
                 } finally {
                     try{
                         if(this.cbtIn!=null)
