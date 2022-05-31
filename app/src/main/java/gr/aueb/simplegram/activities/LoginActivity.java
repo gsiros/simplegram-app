@@ -1,4 +1,4 @@
-package gr.aueb.simplegram;
+package gr.aueb.simplegram.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,11 +11,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import gr.aueb.simplegram.MainActivity;
 import gr.aueb.simplegram.R;
-import gr.aueb.simplegram.activities.SubbedTopicsActivity;
 import gr.aueb.simplegram.common.User;
-import gr.aueb.simplegram.common.UserNode;
+import gr.aueb.simplegram.services.PullService;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -51,6 +49,9 @@ public class LoginActivity extends AppCompatActivity {
 
                 //prepare the usernode
                 ((User) getApplication()).setUserName(usernameInput);
+
+                Intent serviceIntent = new Intent(thisActivity, PullService.class);
+                startService(serviceIntent);
 
                 // Launch main activity.
                 Toast.makeText(getApplicationContext(), "User with username: '"+usernameInput+"' logged in.", Toast.LENGTH_SHORT).show();

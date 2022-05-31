@@ -84,6 +84,45 @@ public class UserNode {
     }
 
     // API methods
+    /**
+     *
+     * CURRENT VERSION;
+     * This method is used in order to load all broker addresses
+     * and ids in usernode.
+     *
+     * FINAL VERSION;
+     * This method is used in order to setup the usernode object
+     * with already existing configuration settings.
+     * ex. broker addresses, topics subscribed, messages, etc...
+     *
+     * @param configFilePath the file path of the broker addresses
+     */
+    public void init(String configFilePath){
+        // ex. topics already subscribed, etc...
+        // Load broker addresses
+        InputStream inputStream;
+        Scanner sc;
+        try {
+            inputStream = this.context.getAssets().open(configFilePath);
+            sc = new Scanner(inputStream);
+            while(sc.hasNextLine()){
+                String line = sc.nextLine();
+                String[] data = line.split(",");
+
+                InetAddress ia = InetAddress.getByName(data[1]);
+                this.brokerAddresses.add(ia);
+                this.brokerConnections.put(ia, new BrokerConnection(Integer.parseInt(data[0]), ia));
+            }
+            inputStream.close();
+            sc.close();
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+
+
+    }
+
+    // API methods
 
     /**
      * This method is used by the terminal in order to subscribe

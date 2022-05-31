@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Simplegram">
         <activity android:name=".activities.SubbedTopicsActivity"></activity>
-        <activity android:name=".LoginActivity">
+        <activity android:name=".activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

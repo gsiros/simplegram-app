@@ -19,6 +19,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 
 import gr.aueb.simplegram.R;
+import gr.aueb.simplegram.adapters.TopicViewAdapter;
 import gr.aueb.simplegram.common.User;
 import gr.aueb.simplegram.common.UserNode;
 
@@ -42,7 +43,8 @@ public class SubbedTopicsActivity extends AppCompatActivity {
 
         // Find elements from layout
         subbedTopcisListView = (ListView) findViewById(R.id.subbedtopics_listview);
-        subbedTopcisAdapter = new ArrayAdapter<String>(this,R.layout.topic_item,topics);
+        //subbedTopcisAdapter = new ArrayAdapter<String>(this,R.layout.improved_topic_item,topics);
+        subbedTopcisAdapter = new TopicViewAdapter(this, topics);
         subbedTopcisListView.setAdapter(subbedTopcisAdapter);
         subToTopicFAB = (FloatingActionButton) findViewById(R.id.subToTopicFAB);
         subscribeDialog = new AlertDialog.Builder(this);
@@ -62,7 +64,7 @@ public class SubbedTopicsActivity extends AppCompatActivity {
                 new SubToTopicTask().execute(inputTopic);
             }
         });
-        // Setup subscrive to topic floating action button.
+        // Setup subscribe to topic floating action button.
         subToTopicFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
