@@ -685,12 +685,17 @@ public class UserNode {
                             ArrayList<Value> unreadValues = unreads.get(topicName);
                             for (Value val : unreadValues) {
                                 if (val instanceof Story) {
-                                    localTopic.addStory((Story) val);
+                                    if(!val.getSentFrom().equals(username))
+                                        localTopic.addStory((Story) val);
                                     //TODO: debug
                                     //System.out.println(TerminalColors.ANSI_GREEN + val.getSentFrom() + "@" + topicName + ": (STORY) " + val + TerminalColors.ANSI_RESET);
                                 } else {
-                                    localTopic.addMessage(val);
-                                    Log.d("UNREAD", ""+val.toString());
+                                    //!localTopic.getMessageQueue().contains(val)
+
+                                    if(!val.getSentFrom().equals(username)){
+                                        localTopic.addMessage(val);
+                                    }
+
                                     // TODO: debug
                                     //System.out.println(TerminalColors.ANSI_GREEN + val.getSentFrom() + "@" + topicName + ": " + val + TerminalColors.ANSI_RESET);
                                 }
@@ -733,146 +738,4 @@ public class UserNode {
         }
     }
 
-    private class PullTask extends SubscriberTask {
-
-        HashMap<String, Topic> topics;
-        BrokerConnection brokerConnection;
-
-        public PullTask(
-                BrokerConnection brokerConnection,
-                HashMap<String, Topic> topics,
-                String username
-        ) {
-            super(username);
-            this.topics = topics;
-            this.brokerConnection = brokerConnection;
-        }
-
-        /**
-         * This method is used in order to receive a multimedia file
-         * from a broker.
-         * @param val_type the type of multimedia file to receive [MULTIF/STORY]
-         * @return MultimediaFile object
-         * @throws Exception
-         */
-        private MultimediaFile receiveFile(String val_type) throws Exception{//data transfer with chunking
-
-            MultimediaFile mf_rcv;
-            if(val_type.equals("MULTIF")){
-                mf_rcv = (MultimediaFile) this.cbtIn.readObject();
-            } else {
-                mf_rcv = (Story) this.cbtIn.readObject();
-            }
-
-            int size = mf_rcv.getFileSize();// amount of expected chunks
-            String filename = mf_rcv.getFilename();// read file name
-
-            FileOutputStream fileOutputStream = new FileOutputStream(filename);
-            byte[] buffer = new byte[512*1024]; //512 * 2^10 (512KByte chunk size)
-
-            while (size>0) {
-                this.cbtIn.readFully(buffer, 0, 512*1024);
-                fileOutputStream.write(buffer,0,512*1024);
-                size --;
-            }
-            fileOutputStream.close();
-            return mf_rcv;
-        }
-
-        /**
-         * This method is a daemon that periodically pulls the latest values
-         * from a broker.
-         */
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            while(true) {
-                //if(brokerConnection.isActive()){
-                try {
-                    // TODO: if timeout then make broker dead. Might not make it in the final version.
-                    String brokerIp = this.brokerConnection.getBrokerAddress().toString().split("/")[1];
-                    this.cbtSocket = new Socket();
-                    this.cbtSocket.connect(new InetSocketAddress(brokerIp, 5001), 3000);
-                    this.cbtOut = new ObjectOutputStream(cbtSocket.getOutputStream());
-                    this.cbtIn = new ObjectInputStream(cbtSocket.getInputStream());
-                    // TODO: debug
-                    //System.out.println("Pulling recent values from Broker #" + brokerConnection.getBrokerID() + " (" + brokerIp + ")");
-                    HashMap<String, ArrayList<Value>> unreads = new HashMap<String, ArrayList<Value>>();
-
-                    this.cbtOut.writeUTF("PULL");
-                    this.cbtOut.flush();
-
-                    this.cbtOut.writeUTF(this.username);
-                    this.cbtOut.flush();
-
-                    do {
-                        String topic_name = this.cbtIn.readUTF();
-                        if (topic_name.equals("---"))
-                            break;
-                        String val_type = this.cbtIn.readUTF();
-                        Value v = null;
-                        if (val_type.equals("MSG")) {
-                            v = (Message) this.cbtIn.readObject();
-                        } else if (val_type.equals("MULTIF") || val_type.equals("STORY")) {
-                            v = this.receiveFile(val_type);
-                        }
-
-                        // add to unread queue
-                        if (unreads.get(topic_name) == null)
-                            unreads.put(topic_name, new ArrayList<Value>());
-                        unreads.get(topic_name).add(v);
-
-
-                    } while (!this.cbtIn.readUTF().equals("---"));
-
-                    synchronized (this.topics) {
-                        for (String topicName : unreads.keySet()) {
-                            Topic localTopic = this.topics.get(topicName);
-                            ArrayList<Value> unreadValues = unreads.get(topicName);
-                            for (Value val : unreadValues) {
-                                if (val instanceof Story) {
-                                    localTopic.addStory((Story) val);
-                                    //TODO: debug
-                                    //System.out.println(TerminalColors.ANSI_GREEN + val.getSentFrom() + "@" + topicName + ": (STORY) " + val + TerminalColors.ANSI_RESET);
-                                } else {
-                                    localTopic.addMessage(val);
-                                    // TODO: debug
-                                    //System.out.println(TerminalColors.ANSI_GREEN + val.getSentFrom() + "@" + topicName + ": " + val + TerminalColors.ANSI_RESET);
-                                }
-                            }
-                        }
-                    }
-
-                } catch(SocketTimeoutException ste) {
-                    // TODO: Fault tolerance? Might not make it in the final version.
-                    /*synchronized (brokerConnection){
-                        brokerConnection.setDead();
-                    }*/
-                    System.out.println("PULL FAIL: Broker #" + brokerConnection.getBrokerID()+" (" + brokerConnection.getBrokerAddress().toString()+") might be dead...");
-                }catch (Exception e) {
-                    //e.printStackTrace();
-                } finally {
-                    try{
-                        if(this.cbtIn!=null)
-                            this.cbtIn.close();
-                        if(this.cbtOut!=null)
-                            this.cbtOut.close();
-                        if(this.cbtSocket != null)
-                            if (!this.cbtSocket.isClosed()){
-                                this.cbtSocket.close();
-                            }
-                    }catch (IOException e){
-                        //e.printStackTrace();
-                    }
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            //}
-
-        }
-    }
 }

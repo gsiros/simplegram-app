@@ -15,6 +15,7 @@
         android:layout_marginLeft="10dp"
         android:layout_centerVertical="true"
         app:maxImageSize="34dp"
+        android:backgroundTint="@color/design_default_color_secondary"
         android:src="@drawable/ic_account_multiple"/>
 
 

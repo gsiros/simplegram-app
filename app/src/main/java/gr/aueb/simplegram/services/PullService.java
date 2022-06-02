@@ -16,7 +16,6 @@ import gr.aueb.simplegram.common.UserNode;
 public class PullService extends Service {
 
 
-    Context context = this;
     Handler handler = null;
     static Runnable runnable = null;
 

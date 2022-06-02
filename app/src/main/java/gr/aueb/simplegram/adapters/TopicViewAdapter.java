@@ -3,6 +3,7 @@ package gr.aueb.simplegram.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 
 import gr.aueb.simplegram.R;
+import gr.aueb.simplegram.activities.TopicActivity;
 import gr.aueb.simplegram.common.Topic;
 
 public class TopicViewAdapter extends ArrayAdapter<Topic> {
@@ -93,6 +95,9 @@ public class TopicViewAdapter extends ArrayAdapter<Topic> {
                 @Override
                 public void onClick(View view) {
                     Toast.makeText(mContext, "Topic name is: "+target_topic.getName(), Toast.LENGTH_SHORT).show();
+                    Intent newActivityIntent = new Intent(mContext, TopicActivity.class);
+                    newActivityIntent.putExtra("TOPIC_NAME", target_topic.getName());
+                    mContext.startActivity(newActivityIntent);
                 }
             });
             convertView.setTag(viewHolder);
