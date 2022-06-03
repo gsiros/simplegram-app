@@ -1,8 +1,14 @@
 package gr.aueb.simplegram.common;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.media.RingtoneManager;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.util.Log;
+
+import androidx.core.app.NotificationCompat;
 
 import java.io.*;
 import java.net.*;
@@ -14,6 +20,8 @@ import com.simplegram.src.Message;
 import com.simplegram.src.MultimediaFile;
 import com.simplegram.src.Story;
 import com.simplegram.src.Value;
+
+import gr.aueb.simplegram.R;
 
 /**
  * Basic class that contains all necessary information
@@ -568,21 +576,6 @@ public class UserNode {
 
     }
 
-    private abstract class SubscriberTask extends AsyncTask<Void, Void, Void> {
-        Socket cbtSocket;
-        ObjectInputStream cbtIn;
-        ObjectOutputStream cbtOut;
-
-        String username;
-
-        public SubscriberTask(
-                String username
-        ) {
-            this.username = username;
-        }
-    }
-
-
     /**
      * This class handles the terminal's 'PULL' request to a broker.
      */
@@ -620,15 +613,32 @@ public class UserNode {
             int size = mf_rcv.getFileSize();// amount of expected chunks
             String filename = mf_rcv.getFilename();// read file name
 
-            FileOutputStream fileOutputStream = new FileOutputStream(filename);
-            byte[] buffer = new byte[512*1024]; //512 * 2^10 (512KByte chunk size)
-
-            while (size>0) {
-                this.cbtIn.readFully(buffer, 0, 512*1024);
-                fileOutputStream.write(buffer,0,512*1024);
-                size --;
+            File dir = new File(context.getFilesDir(), "SimplegramVals");
+            if(!dir.exists()){
+                dir.mkdir();
             }
-            fileOutputStream.close();
+            File destination = new File(dir, filename);
+            OutputStream outputStream;
+            try {
+                destination.createNewFile();
+                //second argument of FileOutputStream constructor indicates whether
+                //to append or create new file if one exists
+                outputStream = new FileOutputStream(destination, true);
+
+                byte[] buffer = new byte[512*1024]; //512 * 2^10 (512KByte chunk size)
+
+                while (size>0) {
+                    this.cbtIn.readFully(buffer, 0, 512*1024);
+                    outputStream.write(buffer,0,512*1024);
+                    outputStream.flush();
+                    size--;
+                }
+                outputStream.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             return mf_rcv;
         }
 
@@ -648,8 +658,6 @@ public class UserNode {
                     this.cbtSocket.connect(new InetSocketAddress(brokerIp, 5001), 3000);
                     this.cbtOut = new ObjectOutputStream(cbtSocket.getOutputStream());
                     this.cbtIn = new ObjectInputStream(cbtSocket.getInputStream());
-                    // TODO: debug
-                    //System.out.println("Pulling recent values from Broker #" + brokerConnection.getBrokerID() + " (" + brokerIp + ")");
                     HashMap<String, ArrayList<Value>> unreads = new HashMap<String, ArrayList<Value>>();
 
                     this.cbtOut.writeUTF("PULL");
@@ -685,8 +693,9 @@ public class UserNode {
                             ArrayList<Value> unreadValues = unreads.get(topicName);
                             for (Value val : unreadValues) {
                                 if (val instanceof Story) {
-                                    if(!val.getSentFrom().equals(username))
+                                    if(!val.getSentFrom().equals(username)){
                                         localTopic.addStory((Story) val);
+                                    }
                                     //TODO: debug
                                     //System.out.println(TerminalColors.ANSI_GREEN + val.getSentFrom() + "@" + topicName + ": (STORY) " + val + TerminalColors.ANSI_RESET);
                                 } else {

@@ -10,11 +10,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Simplegram">
-        <activity android:name=".activities.TopicActivity"
-            android:windowSoftInputMode="adjustPan"></activity>
-
+        <activity android:name=".activities.VideoActivity"></activity>
+        <activity
+            android:name=".activities.TopicActivity"
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".activities.SubbedTopicsActivity" />
-
         <activity android:name=".activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,10 +26,11 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.Simplegram.NoActionBar" />
+
         <service android:name=".services.PullService" />
     </application>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
 </manifest>
