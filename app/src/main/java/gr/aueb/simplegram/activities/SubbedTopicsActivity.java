@@ -36,7 +36,15 @@ public class SubbedTopicsActivity extends AppCompatActivity {
     EditText subscribeEditText;
     Context context = this;
 
+    UserNode userNode;
+
     ArrayList<Topic> topics;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        userNode = ((User) getApplication()).getUserNode();
+    }
 
 
     @Override
@@ -44,7 +52,8 @@ public class SubbedTopicsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subbed_topics);
 
-        topics = new ArrayList<Topic>(((User) getApplication()).getUserNode().getTopics().values());
+        userNode = ((User) getApplication()).getUserNode();
+        topics = new ArrayList<>(userNode.getTopics().values());
 
         // Find elements from layout
         subbedTopcisListView = (ListView) findViewById(R.id.subbedtopics_listview);

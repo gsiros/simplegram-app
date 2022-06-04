@@ -18,8 +18,11 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 
 import gr.aueb.simplegram.R;
+import gr.aueb.simplegram.activities.StoryPreview;
 import gr.aueb.simplegram.activities.TopicActivity;
 import gr.aueb.simplegram.common.Topic;
+import gr.aueb.simplegram.common.User;
+import gr.aueb.simplegram.common.UserNode;
 
 public class TopicViewAdapter extends ArrayAdapter<Topic> {
 
@@ -30,6 +33,7 @@ public class TopicViewAdapter extends ArrayAdapter<Topic> {
     }
 
     private ArrayList<Topic> dataSet;
+    private UserNode userNode;
     Context mContext;
 
     // View lookup cache
@@ -44,7 +48,7 @@ public class TopicViewAdapter extends ArrayAdapter<Topic> {
         super(context, R.layout.improved_topic_item, data);
         this.dataSet = data;
         this.mContext=context;
-
+        this.userNode = ((User) context.getApplicationContext()).getUserNode();
     }
 
 
@@ -66,24 +70,24 @@ public class TopicViewAdapter extends ArrayAdapter<Topic> {
             convertView = inflater.inflate(R.layout.improved_topic_item, parent, false);
             viewHolder.textView = (TextView) convertView.findViewById(R.id.label);
             viewHolder.imageView = (ImageView) convertView.findViewById(R.id.story_ring);
-            ((Activity) mContext).runOnUiThread(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            viewHolder.imageView.setVisibility(View.INVISIBLE);
-                        }
-                    }
-            );
+
             viewHolder.fab = (FloatingActionButton) convertView.findViewById(R.id.topic_fab);
             viewHolder.fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(mContext, "Launch story activity for topic.", Toast.LENGTH_SHORT).show();
                     ((Activity) mContext).runOnUiThread(
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                    viewHolder.imageView.setVisibility(View.VISIBLE);
+                                    if(!userNode.getTopics().get(target_topic.getName()).getStoryQueue().isEmpty()){
+                                        Intent showStoryIntent = new Intent(mContext, StoryPreview.class);
+                                        showStoryIntent.putExtra("topicname", target_topic.getName());
+                                        mContext.startActivity(showStoryIntent);
+
+                                    } else {
+                                        Toast.makeText(mContext, "No stories available!", Toast.LENGTH_SHORT).show();
+                                    }
+
                                 }
                             }
                     );
@@ -100,6 +104,35 @@ public class TopicViewAdapter extends ArrayAdapter<Topic> {
                     mContext.startActivity(newActivityIntent);
                 }
             });
+
+            Runnable storyCheckerRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    // Check story...
+                    Topic topic = userNode.getTopics().get(target_topic.getName());
+                    if(!topic.getStoryQueue().isEmpty()){
+                        ((Activity) mContext).runOnUiThread(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        viewHolder.imageView.setVisibility(View.VISIBLE);
+                                    }
+                                }
+                        );
+                    } else {
+                        ((Activity) mContext).runOnUiThread(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        viewHolder.imageView.setVisibility(View.INVISIBLE);
+                                    }
+                                }
+                        );
+                    }
+                    viewHolder.imageView.postDelayed(this, 1000);
+                }
+            };
+            viewHolder.imageView.post(storyCheckerRunnable);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (TopicView) convertView.getTag();

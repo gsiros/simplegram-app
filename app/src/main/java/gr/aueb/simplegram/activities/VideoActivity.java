@@ -20,11 +20,13 @@ public class VideoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
         videoView = (VideoView) findViewById(R.id.videoView);
+        String topicname = getIntent().getExtras().getString("topicname");
+        String filename = getIntent().getExtras().getString("filename");
         MediaController mediaController = new MediaController(this);
         mediaController.setAnchorView(videoView);
         // Set video link (mp4 format )
         videoView.setMediaController(mediaController);
-        videoView.setVideoURI(Uri.fromFile(new File(getFilesDir()+"/SimplegramVals/"+getIntent().getExtras().getString("filename"))));
+        videoView.setVideoURI(Uri.fromFile(new File(getFilesDir()+"/SimplegramVals/"+topicname+"/"+filename)));
         videoView.start();
 
     }

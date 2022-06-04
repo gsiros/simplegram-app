@@ -127,6 +127,19 @@ public class Topic {
         return msgs;
     }
 
+    /**
+     * This method returns the latest not viewed story for a user.
+     * CLIENT ONLY METHOD.
+     * @return
+     */
+    public Story getLatestStoryFor(){
+        Story storyToReturn;
+        synchronized (this.storyQueue){
+            storyToReturn = this.storyQueue.remove(0);
+        }
+        return storyToReturn;
+    }
+
     public String getName() {
         return this.name;
     }

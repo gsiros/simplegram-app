@@ -4,6 +4,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
@@ -68,17 +69,16 @@ public class UserNode {
 
     /**
      * This method is used to break a multimediafile in chunks.
-     * @param path the multimedia file path
+     * @param uri the multimedia file path
      * @return ArrayList of chunk. Each chunk is a byte array.
      */
-    public static ArrayList<byte[]> chunkify(String path) {
+    public ArrayList<byte[]> chunkify(Uri uri) {
 
         ArrayList<byte[]> chunks = new ArrayList<byte[]>();
 
         try {
             int bytes = 0;
-            File file = new File(path);
-            FileInputStream fileInputStream = new FileInputStream(file);
+            FileInputStream fileInputStream = new FileInputStream(context.getContentResolver().openFileDescriptor(uri, "r").getFileDescriptor());
 
             // break file into chunks
             byte[] buffer = new byte[512 * 1024];
@@ -540,7 +540,6 @@ public class UserNode {
                         new ArrayList<byte[]>()
                 );
             }
-            System.out.println("new chunks: "+mf2send_empty.getChunks().size());
 
             this.cbtOut.writeObject(mf2send_empty);
             this.cbtOut.flush();
@@ -597,14 +596,17 @@ public class UserNode {
         /**
          * This method is used in order to receive a multimedia file
          * from a broker.
+         * @param topicname the name of the topic
          * @param val_type the type of multimedia file to receive [MULTIF/STORY]
          * @return MultimediaFile object
          * @throws Exception
          */
-        private MultimediaFile receiveFile(String val_type) throws Exception{//data transfer with chunking
+        private MultimediaFile receiveFile(String topicname, String val_type) throws Exception{//data transfer with chunking
+            Log.d("KAPOIOEXCEPTION", "receiveFile: IN");
 
             MultimediaFile mf_rcv;
             if(val_type.equals("MULTIF")){
+                Log.d("KAPOIOEXCEPTION", "val: multimedia");
                 mf_rcv = (MultimediaFile) this.cbtIn.readObject();
             } else {
                 mf_rcv = (Story) this.cbtIn.readObject();
@@ -613,29 +615,34 @@ public class UserNode {
             int size = mf_rcv.getFileSize();// amount of expected chunks
             String filename = mf_rcv.getFilename();// read file name
 
-            File dir = new File(context.getFilesDir(), "SimplegramVals");
+            Log.d("KAPOIOEXCEPTION", "receiveFile: ola kala mexri edw");
+            File dir = new File(context.getFilesDir(), "SimplegramVals/"+topicname);
             if(!dir.exists()){
-                dir.mkdir();
+                Log.d("KAPOIOEXCEPTION", "kala edw mesa mpainei kan>");
+
+                dir.mkdirs();
             }
             File destination = new File(dir, filename);
+
             OutputStream outputStream;
+            Log.d("KAPOIOEXCEPTION", "receiveFile: kai edw");
             try {
                 destination.createNewFile();
-                //second argument of FileOutputStream constructor indicates whether
-                //to append or create new file if one exists
                 outputStream = new FileOutputStream(destination, true);
+                Log.d("KAPOIOEXCEPTION", "receiveFile: edw isws?");
 
                 byte[] buffer = new byte[512*1024]; //512 * 2^10 (512KByte chunk size)
 
                 while (size>0) {
                     this.cbtIn.readFully(buffer, 0, 512*1024);
+                    Log.d("KAPOIOEXCEPTION", "receiveFile: read byte #"+size);
                     outputStream.write(buffer,0,512*1024);
-                    outputStream.flush();
                     size--;
                 }
                 outputStream.close();
 
             } catch (IOException e) {
+                Log.d("KAPOIOEXCEPTION", "EXCEPTION CATCH");
                 e.printStackTrace();
             }
 
@@ -675,7 +682,7 @@ public class UserNode {
                         if (val_type.equals("MSG")) {
                             v = (Message) this.cbtIn.readObject();
                         } else if (val_type.equals("MULTIF") || val_type.equals("STORY")) {
-                            v = this.receiveFile(val_type);
+                            v = this.receiveFile(topic_name, val_type);
                         }
 
                         // add to unread queue

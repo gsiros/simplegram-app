@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import gr.aueb.simplegram.R;
+import gr.aueb.simplegram.activities.ImageActivity;
 import gr.aueb.simplegram.activities.VideoActivity;
 import gr.aueb.simplegram.common.User;
 import gr.aueb.simplegram.common.UserNode;
@@ -45,6 +46,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     private final static int ME_VIDEO = 5;
     private final static int OTHER_VIDEO = 6;
 
+    private String topicname;
 
     private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
         TextView messageText, timeText, nameText, dateText;
@@ -66,6 +68,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
 
 
     }
+
     private class SentMessageHolder extends RecyclerView.ViewHolder {
         TextView messageText, timeText, dateText;
 
@@ -82,6 +85,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             dateText.setText(msg.getDateSent().getMonth().toString()+", "+msg.getDateSent().getDayOfMonth());
         }
     }
+
     private class ReceivedPhotoHolder extends RecyclerView.ViewHolder {
         TextView timeText, nameText, dateText;
         ImageView imageView;
@@ -95,12 +99,22 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         }
 
         void bind(MultimediaFile multimediaFile) {
-            imageView.setImageURI(Uri.fromFile(new File(context.getFilesDir()+"/SimplegramVals/"+multimediaFile.getFilename())));
+            imageView.setImageURI(Uri.fromFile(new File(context.getFilesDir()+"/SimplegramVals/"+topicname+"/"+multimediaFile.getFilename())));
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent showImageIntent = new Intent(context, ImageActivity.class);
+                    showImageIntent.putExtra("filename", multimediaFile.getFilename());
+                    showImageIntent.putExtra("topicname", topicname);
+                    context.startActivity(showImageIntent);
+                }
+            });
             timeText.setText(multimediaFile.getDateSent().getHour()+":"+multimediaFile.getDateSent().getMinute());
             dateText.setText(multimediaFile.getDateSent().getMonth().toString()+", "+multimediaFile.getDateSent().getDayOfMonth());
             nameText.setText(multimediaFile.getSentFrom());
         }
     }
+
     private class SentPhotoHolder extends RecyclerView.ViewHolder {
         TextView timeText, dateText;
         ImageView imageView;
@@ -108,16 +122,27 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         SentPhotoHolder(View itemView) {
             super(itemView);
             imageView = (ImageView) itemView.findViewById(R.id.image_gchat_multimedia_me_photo);
-            timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_me);
-            dateText = (TextView) itemView.findViewById(R.id.text_gchat_date_me);
+            timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_me_photo);
+            dateText = (TextView) itemView.findViewById(R.id.text_gchat_date_me_photo);
         }
 
         void bind(MultimediaFile multimediaFile) {
-            imageView.setImageResource(R.drawable.ic_account_multiple);
+            imageView.setImageURI(Uri.fromFile(new File(context.getFilesDir()+"/SimplegramVals/"+topicname+"/"+multimediaFile.getFilename())));
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent showImageIntent = new Intent(context, ImageActivity.class);
+                    showImageIntent.putExtra("filename", multimediaFile.getFilename());
+                    showImageIntent.putExtra("topicname", topicname);
+                    context.startActivity(showImageIntent);
+                }
+            });
             timeText.setText(multimediaFile.getDateSent().getHour() + ":" + multimediaFile.getDateSent().getMinute());
             dateText.setText(multimediaFile.getDateSent().getMonth().toString() + ", " + multimediaFile.getDateSent().getDayOfMonth());
+
         }
     }
+
     private class ReceivedVideoHolder extends RecyclerView.ViewHolder {
         TextView timeText, nameText, dateText, filenameTextView;
         ImageView imageView;
@@ -139,6 +164,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
                 public void onClick(View view) {
                     Intent playVideoIntent = new Intent(context, VideoActivity.class);
                     playVideoIntent.putExtra("filename", multimediaFile.getFilename());
+                    playVideoIntent.putExtra("topicname", topicname);
                     context.startActivity(playVideoIntent);
                 }
             });
@@ -149,6 +175,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
 
         }
     }
+
     private class SentVideoHolder extends RecyclerView.ViewHolder {
         TextView timeText, dateText, filenameTextView;
         ImageView imageView;
@@ -168,6 +195,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
                 public void onClick(View view) {
                     Intent playVideoIntent = new Intent(context, VideoActivity.class);
                     playVideoIntent.putExtra("filename", multimediaFile.getFilename());
+                    playVideoIntent.putExtra("topicname", topicname);
                     context.startActivity(playVideoIntent);
                 }
             });
@@ -176,12 +204,14 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         }
     }
 
+
     private Context context;
     private List<Value> valueList;
 
-    public MessageListAdapter(Context context, List<Value> valueList) {
+    public MessageListAdapter(Context context, String topicname, List<Value> valueList) {
         this.context = context;
         this.valueList = valueList;
+        this.topicname = topicname;
     }
 
     // Determines the appropriate ViewType according to the sender of the message.
