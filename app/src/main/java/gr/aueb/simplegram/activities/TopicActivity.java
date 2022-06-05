@@ -76,8 +76,10 @@ public class TopicActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_topic);
+
         UserNode userNode = ((User) getApplication()).getUserNode();
         topicname = getIntent().getExtras().getString("TOPIC_NAME");
+        getSupportActionBar().setTitle(topicname);
 
         pushButton = (Button) findViewById(R.id.button_gchat_send);
         inputText = (EditText) findViewById(R.id.edit_gchat_message);

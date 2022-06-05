@@ -1,9 +1,13 @@
 package gr.aueb.simplegram.adapters;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +28,16 @@ import gr.aueb.simplegram.common.Topic;
 import gr.aueb.simplegram.common.User;
 import gr.aueb.simplegram.common.UserNode;
 
+import static androidx.core.app.ActivityCompat.requestPermissions;
+
 public class TopicViewAdapter extends ArrayAdapter<Topic> {
+
+    private static final int SELECT_PICTURE = 100;
+    private static final int SELECT_PICTURE_PERMISSION_CODE = 101;
+
+    private String topicToPass;
+
+
 
     private static class TopicView{
         FloatingActionButton fab;
@@ -41,6 +54,14 @@ public class TopicViewAdapter extends ArrayAdapter<Topic> {
         this.dataSet = data;
         this.mContext=context;
         this.userNode = ((User) context.getApplicationContext()).getUserNode();
+    }
+
+    public String getTargetTopic() {
+        return topicToPass;
+    }
+
+    private void setTopicToPass(String topicToPass) {
+        this.topicToPass = topicToPass;
     }
 
 
@@ -74,6 +95,31 @@ public class TopicViewAdapter extends ArrayAdapter<Topic> {
                     } else {
                         Toast.makeText(mContext, "No stories available!", Toast.LENGTH_SHORT).show();
                     }
+                }
+            });
+            viewHolder.fab.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    Toast.makeText(mContext, "Long press i guess...", Toast.LENGTH_SHORT).show();
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                        if(mContext.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                                == PackageManager.PERMISSION_DENIED){
+                            String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE};
+                            ((Activity) mContext).requestPermissions(permissions, SELECT_PICTURE_PERMISSION_CODE);
+                            Log.d("topicname", "doInBackground: 1"+target_topic.getName());
+
+                            setTopicToPass(target_topic.getName());
+                        } else{
+                            Log.d("topicname", "doInBackground: 2"+target_topic.getName());
+                            setTopicToPass(target_topic.getName());
+                            pickImageFromGallery(target_topic.getName());
+                        }
+                    } else {
+                        Log.d("topicname", "doInBackground: 3"+target_topic.getName());
+                        setTopicToPass(target_topic.getName());
+                        pickImageFromGallery(target_topic.getName());
+                    }
+                    return true;
                 }
             });
             result=convertView;
@@ -114,6 +160,14 @@ public class TopicViewAdapter extends ArrayAdapter<Topic> {
         return result;
     }
 
+    private void pickImageFromGallery(String topicname){
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/* video/*");
+        intent.putExtra("topicname", topicname);
+        Log.d("topicname", "doInBackground: 4"+topicname);
+
+        ((Activity) mContext).startActivityForResult(intent, SELECT_PICTURE);
+    }
 
 }
 

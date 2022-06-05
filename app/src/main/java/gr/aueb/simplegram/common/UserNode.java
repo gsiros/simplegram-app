@@ -1,15 +1,8 @@
 package gr.aueb.simplegram.common;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.Context;
-import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Environment;
 import android.util.Log;
-
-import androidx.core.app.NotificationCompat;
 
 import java.io.*;
 import java.net.*;
