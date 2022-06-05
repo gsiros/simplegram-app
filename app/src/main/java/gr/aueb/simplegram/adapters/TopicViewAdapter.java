@@ -36,14 +36,6 @@ public class TopicViewAdapter extends ArrayAdapter<Topic> {
     private UserNode userNode;
     Context mContext;
 
-    // View lookup cache
-    private static class ViewHolder {
-        TextView txtName;
-        TextView txtType;
-        TextView txtVersion;
-        ImageView info;
-    }
-
     public TopicViewAdapter(Context context, ArrayList<Topic> data) {
         super(context, R.layout.improved_topic_item, data);
         this.dataSet = data;
@@ -52,12 +44,11 @@ public class TopicViewAdapter extends ArrayAdapter<Topic> {
     }
 
 
-    private Topic target_topic = null;
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
-        target_topic = (Topic) getItem(position);
+        Topic target_topic = getItem(position);
         // Check if an existing view is being reused, otherwise inflate the view
         TopicView viewHolder; // view lookup cache stored in tag
 
@@ -75,22 +66,14 @@ public class TopicViewAdapter extends ArrayAdapter<Topic> {
             viewHolder.fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((Activity) mContext).runOnUiThread(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    if(!userNode.getTopics().get(target_topic.getName()).getStoryQueue().isEmpty()){
-                                        Intent showStoryIntent = new Intent(mContext, StoryPreview.class);
-                                        showStoryIntent.putExtra("topicname", target_topic.getName());
-                                        mContext.startActivity(showStoryIntent);
+                    if(!userNode.getTopics().get(target_topic.getName()).getStoryQueue().isEmpty()){
+                        Intent showStoryIntent = new Intent(mContext, StoryPreview.class);
+                        showStoryIntent.putExtra("topicname", target_topic.getName());
+                        mContext.startActivity(showStoryIntent);
 
-                                    } else {
-                                        Toast.makeText(mContext, "No stories available!", Toast.LENGTH_SHORT).show();
-                                    }
-
-                                }
-                            }
-                    );
+                    } else {
+                        Toast.makeText(mContext, "No stories available!", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
             result=convertView;
@@ -111,23 +94,9 @@ public class TopicViewAdapter extends ArrayAdapter<Topic> {
                     // Check story...
                     Topic topic = userNode.getTopics().get(target_topic.getName());
                     if(!topic.getStoryQueue().isEmpty()){
-                        ((Activity) mContext).runOnUiThread(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        viewHolder.imageView.setVisibility(View.VISIBLE);
-                                    }
-                                }
-                        );
+                        viewHolder.imageView.setVisibility(View.VISIBLE);
                     } else {
-                        ((Activity) mContext).runOnUiThread(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        viewHolder.imageView.setVisibility(View.INVISIBLE);
-                                    }
-                                }
-                        );
+                        viewHolder.imageView.setVisibility(View.INVISIBLE);
                     }
                     viewHolder.imageView.postDelayed(this, 1000);
                 }
@@ -141,7 +110,7 @@ public class TopicViewAdapter extends ArrayAdapter<Topic> {
 
         viewHolder.textView.setText(target_topic.getName());
         // Return the completed view to render on screen
-        return convertView;
+        return result;
     }
 
 

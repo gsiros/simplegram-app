@@ -123,7 +123,7 @@ public class Topic {
                 msgs.add(this.storyQueue.get(j));
         }
         this.indexInTopic.put(user, this.messageQueue.size());
-        this.indexInStories.put(user, this.messageQueue.size());
+        this.indexInStories.put(user, this.storyQueue.size());
         return msgs;
     }
 
