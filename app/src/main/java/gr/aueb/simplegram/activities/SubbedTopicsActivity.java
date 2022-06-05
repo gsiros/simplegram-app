@@ -34,7 +34,6 @@ public class SubbedTopicsActivity extends AppCompatActivity {
     ArrayAdapter subbedTopcisAdapter;
     AlertDialog.Builder subscribeDialog;
     EditText subscribeEditText;
-    Context context = this;
 
     UserNode userNode;
 

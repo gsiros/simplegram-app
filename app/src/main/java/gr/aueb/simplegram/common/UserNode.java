@@ -59,13 +59,6 @@ public class UserNode {
         return topics;
     }
 
-    /**
-     * This method starts the various daemon threads.
-     */
-    public void userStart() {
-        StoryChecker sc = new StoryChecker(this.topics);
-        sc.start();
-    }
 
     /**
      * This method is used to break a multimediafile in chunks.

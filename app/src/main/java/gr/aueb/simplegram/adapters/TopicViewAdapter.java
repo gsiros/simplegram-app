@@ -93,6 +93,7 @@ public class TopicViewAdapter extends ArrayAdapter<Topic> {
                 public void run() {
                     // Check story...
                     Topic topic = userNode.getTopics().get(target_topic.getName());
+                    topic.cleanStories();
                     if(!topic.getStoryQueue().isEmpty()){
                         viewHolder.imageView.setVisibility(View.VISIBLE);
                     } else {

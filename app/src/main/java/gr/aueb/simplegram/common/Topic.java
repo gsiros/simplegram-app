@@ -150,7 +150,6 @@ public class Topic {
     public void cleanStories(){
         if(this.storyQueue.size()!=0 && this.storyQueue.get(0).hasExpired()) {
             this.storyQueue.remove(0);
-            System.out.println("1 story removed!");
         }
     }
 }
