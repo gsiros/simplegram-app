@@ -163,8 +163,6 @@ public class UserNode {
                 }
 
                 String brokerIp = brokerAddress.toString().split("/")[1];
-                // TODO: debug
-                //System.out.println("Attempting to send to Broker with IP: "+brokerIp);
                 cbtSocket = new Socket();
                 cbtSocket.connect(new InetSocketAddress(brokerIp, 5001), 3000);
                 cbtOut = new ObjectOutputStream(cbtSocket.getOutputStream());
@@ -189,7 +187,6 @@ public class UserNode {
                         this.topics.get(topicname).addUser(this.username);
                     }
                     String reply = cbtIn.readUTF();
-                    //TODO: debug
                     Log.d("TAGHERE", "SERVER REPLY"+reply);
 
                     //System.out.println(reply);
@@ -198,7 +195,6 @@ public class UserNode {
                     // Get correct broker...
                     int correctBrokerToCommTo = Integer.parseInt(cbtIn.readUTF());
                     brokerID = correctBrokerToCommTo;
-                    // TODO: debug
                     //System.out.println("Broker not responsible for topic... communicating with broker #" + correctBrokerToCommTo);
                 }
 
@@ -373,7 +369,6 @@ public class UserNode {
      * from all the brokers in the network.
      */
     public void pull(){
-        // TODO: implement
         for(BrokerConnection bc : this.brokerConnections.values()){
             PullHandler pullh = new PullHandler(bc,this.topics, this.username);
             pullh.start();
@@ -659,7 +654,6 @@ public class UserNode {
             while(true) {
                 //if(brokerConnection.isActive()){
                 try {
-                    // TODO: if timeout then make broker dead. Might not make it in the final version.
                     String brokerIp = this.brokerConnection.getBrokerAddress().toString().split("/")[1];
                     this.cbtSocket = new Socket();
                     this.cbtSocket.connect(new InetSocketAddress(brokerIp, 5001), 3000);
@@ -703,7 +697,6 @@ public class UserNode {
                                     if(!val.getSentFrom().equals(username)){
                                         localTopic.addStory((Story) val);
                                     }
-                                    //TODO: debug
                                     //System.out.println(TerminalColors.ANSI_GREEN + val.getSentFrom() + "@" + topicName + ": (STORY) " + val + TerminalColors.ANSI_RESET);
                                 } else {
                                     //!localTopic.getMessageQueue().contains(val)
@@ -712,7 +705,6 @@ public class UserNode {
                                         localTopic.addMessage(val);
                                     }
 
-                                    // TODO: debug
                                     //System.out.println(TerminalColors.ANSI_GREEN + val.getSentFrom() + "@" + topicName + ": " + val + TerminalColors.ANSI_RESET);
                                 }
                             }
@@ -720,7 +712,6 @@ public class UserNode {
                     }
 
                 } catch(SocketTimeoutException ste) {
-                    // TODO: Fault tolerance? Might not make it in the final version.
                     /*synchronized (brokerConnection){
                         brokerConnection.setDead();
                     }*/
