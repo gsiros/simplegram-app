@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -133,19 +134,28 @@ public class SubbedTopicsActivity extends AppCompatActivity {
 
             UserNode userNode = ((User) getApplication()).getUserNode();
 
-            Uri imageUri = (Uri) objs[0];
+            Uri uri = (Uri) objs[0];
             String topicname = (String) objs[1];
             Log.d("topicname", "doInBackground: "+topicname);
-            String[] pathComponents = imageUri.getPath().split("/");
+            String[] pathComponents = uri.getPath().split("/");
             String filename = pathComponents[pathComponents.length-1];
 
+            String type;
+            ContentResolver cR = getContentResolver();
+            String mimeType = cR.getType(uri);
+            if(mimeType.startsWith("image/")){
+                type = "PHOTO";
+            } else {
+                type = "VIDEO";
+            }
 
-            ArrayList<byte[]> chunks = userNode.chunkify(imageUri);
+            ArrayList<byte[]> chunks = userNode.chunkify(uri);
             Story story2send = new Story(
                     myusername,
                     filename,
                     chunks.size(),
-                    chunks
+                    chunks,
+                    type
             );
 
 

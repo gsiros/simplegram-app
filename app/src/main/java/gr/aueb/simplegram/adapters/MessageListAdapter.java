@@ -234,13 +234,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             }
         } else {
             MultimediaFile mf = (MultimediaFile) val;
-            String[] parts = mf.getFilename().split("\\.");
-            String ext = parts[parts.length - 1];
-            ArrayList<String> imageExtensions = new ArrayList<String>();
-            imageExtensions.add("png");
-            imageExtensions.add("jpg");
-            imageExtensions.add("jpeg");
-            if(imageExtensions.contains(ext)){
+            if(mf.getType().equals("PHOTO")){
                 if (val.getSentFrom().equals(myusername)) {
                     // If the current user is the sender of the message
                     return ME_PHOTO;

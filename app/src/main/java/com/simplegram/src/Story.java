@@ -11,13 +11,13 @@ import java.util.ArrayList;
 public class Story extends MultimediaFile implements Serializable {
 
 
-    public Story(String sentFrom, String filename, int fileSize, ArrayList<byte[]> chunks) {
-        super(sentFrom, filename, fileSize, chunks);
+    public Story(String sentFrom, String filename, int fileSize, ArrayList<byte[]> chunks, String type) {
+        super(sentFrom, filename, fileSize, chunks, type);
     }
 
 
-    public Story(LocalDateTime dateSent, String sentFrom, String filename, int fileSize, ArrayList<byte[]> chunks) {
-        super(dateSent, sentFrom, filename, fileSize, chunks);
+    public Story(LocalDateTime dateSent, String sentFrom, String filename, int fileSize, ArrayList<byte[]> chunks, String type) {
+        super(dateSent, sentFrom, filename, fileSize, chunks, type);
     }
 
     /**

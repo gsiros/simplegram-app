@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,6 +22,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.provider.MediaStore.Images.Media;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -38,6 +40,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
@@ -170,17 +173,26 @@ public class TopicActivity extends AppCompatActivity {
 
             UserNode userNode = ((User) getApplication()).getUserNode();
 
-            Uri imageUri = uris[0];
-            String[] pathComponents = imageUri.getPath().split("/");
+            Uri uri = uris[0];
+            String[] pathComponents = uri.getPath().split("/");
             String filename = pathComponents[pathComponents.length-1];
 
+            String type;
+            ContentResolver cR = context.getContentResolver();
+            String mimeType = cR.getType(uri);
+            if(mimeType.startsWith("image/")){
+                type = "PHOTO";
+            } else {
+                type = "VIDEO";
+            }
 
-            ArrayList<byte[]> chunks = userNode.chunkify(imageUri);
+            ArrayList<byte[]> chunks = userNode.chunkify(uri);
             MultimediaFile mf2send = new MultimediaFile(
                     myusername,
                     filename,
                     chunks.size(),
-                    chunks
+                    chunks,
+                    type
             );
 
             userNode.pushValue(

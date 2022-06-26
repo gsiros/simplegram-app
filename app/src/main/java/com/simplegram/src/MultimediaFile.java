@@ -17,27 +17,31 @@ public class MultimediaFile extends Value implements Serializable {
     private String filename;
     private int fileSize;
     private ArrayList<byte[]> chunks;
+    private String type;
 
     public MultimediaFile(
             String sentFrom,
             String filename,
             int fileSize,
-            ArrayList<byte[]> chunks
-            ) {
+            ArrayList<byte[]> chunks,
+            String type
+    ) {
         super(sentFrom);
         this.filename = filename;
         this.fileSize = fileSize;
         this.chunks = chunks;
         this.fileSize = fileSize;
+        this.type = type;
     }
 
 
-    public MultimediaFile(LocalDateTime dateSent, String sentFrom, String filename, int fileSize, ArrayList<byte[]> chunks) {
+    public MultimediaFile(LocalDateTime dateSent, String sentFrom, String filename, int fileSize, ArrayList<byte[]> chunks, String type) {
         super(dateSent, sentFrom);
         this.filename = filename;
         this.fileSize = fileSize;
         this.chunks = chunks;
         this.fileSize = fileSize;
+        this.type = type;
     }
 
     public String getFilename() {
@@ -52,9 +56,12 @@ public class MultimediaFile extends Value implements Serializable {
         return chunks;
     }
 
+    public String getType(){
+        return this.type;
+    }
+
     @Override
     public String toString() {
         return this.filename;
     }
 }
-

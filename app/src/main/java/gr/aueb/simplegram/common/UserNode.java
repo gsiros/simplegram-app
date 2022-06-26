@@ -510,7 +510,8 @@ public class UserNode {
                         mf2send.getSentFrom(),
                         mf2send.getFilename(),
                         chunks.size(),
-                        new ArrayList<byte[]>()
+                        new ArrayList<byte[]>(),
+                        mf2send.getType()
                 );
             } else {
                 mf2send_empty = new MultimediaFile(
@@ -518,7 +519,8 @@ public class UserNode {
                         mf2send.getSentFrom(),
                         mf2send.getFilename(),
                         chunks.size(),
-                        new ArrayList<byte[]>()
+                        new ArrayList<byte[]>(),
+                        mf2send.getType()
                 );
             }
 
