@@ -14,6 +14,12 @@ In order to distribute the content, we need to know:
 - **how how can they express interest** (_topic subscription_) and
 - **how can they receive it**.
 
+## Architecture
+
+The system is divided in two parts:
+- [Multimedia Streaming Framework](https://github.com/gsiros/simplegram "Multimedia Streaming Framework")
+- Front End Android App
+
 ## Android Application
 
 This repoisotory accommodates the implementation of the front end of the system. The Android application leverages the main [framework](https://github.com/gsiros/simplegram "framework") in order for the user to exchange information with other users. In addition to content exchange, multimedia can be displayed from the application.
